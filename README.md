@@ -68,67 +68,97 @@ To run this code, you need the following libraries installed:
 * `dask` (potentially used for larger-than-memory data handling)
 * `pandas-market-calendars` (for `process_missing_data.py`)
 
+```
 You can install most of the required libraries using pip:
 
 ```bash
 pip install numpy pandas matplotlib seaborn torch scikit-learn scipy tqdm polygon-api-client pyarrow dask pandas-market-calendars
-Note that bulk_polygon_data.py requires setting the POLYGON_API_KEY environment variable to fetch data from Polygon.io.
 
-Installation
+```
+
+Note that bulk_polygon_data.py requires setting the `POLYGON_API_KEY` environment variable to fetch data from Polygon.io.
+
+## Installation
+
 Clone this repository:
+
 Bash
 
+```
 git clone <repository_url>
 cd <repository_folder>
-(Replace <repository_url> and <repository_folder> with your actual repository details)
+
+```
+
+(Replace `<repository_url>` and `<repository_folder>` with your actual repository details)
+
 Install the required dependencies (see Requirements).
-Set your POLYGON_API_KEY environment variable if you plan to run the data collection script:
+
+Set your `POLYGON_API_KEY` environment variable if you plan to run the data collection script:
+
 Bash
 
+```
 export POLYGON_API_KEY="your_api_key_here"
-(Replace "your_api_key_here" with your actual Polygon.io API key)
-Data
-The project structure expects data files in the ./data/ directory.
 
-Ticker List: The list of tickers to process is expected in ./data/info/all_sp500.csv.
-Raw Data: Raw 1-minute bar data fetched from Polygon.io is saved to ./data/raw_1min_top_sp500_bulk/ as partitioned Parquet files.
-Processed Data: Cleaned and filled minute-level data is saved to ./data/processed_1min_top_sp500_bulk/ as partitioned Parquet files.
-Final Dataset: The final processed dataset, ready for model training (resulting from Pass B and market target computation), should be saved to a location from which the notebooks can load it. Confirm the saving location in run_data_processing.py.
+```
+
+(Replace `"your_api_key_here"` with your actual Polygon.io API key)
+
+## Data
+
+The project structure expects data files in the `./data/` directory.
+
+-   **Ticker List**: The list of tickers to process is expected in `./data/info/all_sp500.csv`.
+-   **Raw Data**: Raw 1-minute bar data fetched from Polygon.io is saved to `./data/raw_1min_top_sp500_bulk/` as partitioned Parquet files.
+-   **Processed Data**: Cleaned and filled minute-level data is saved to `./data/processed_1min_top_sp500_bulk/` as partitioned Parquet files.
+-   **Final Dataset**: The final processed dataset, ready for model training (resulting from Pass B and market target computation), should be saved to a location from which the notebooks can load it. Confirm the saving location in `run_data_processing.py`.
+
 To use your own data:
 
-If using Polygon.io, configure the paths and settings in src/data_processing/bulk_polygon_data.py and run it.
-If using a different data source, format your raw minute-level data to be compatible with the structure expected by src/data_processing/process_missing_data.py (ideally, partitioned Parquet files by symbol, year, month with relevant columns) and place it in ./data/raw_1min_top_sp500_bulk/.
-Ensure the data processing scripts (src/data_processing/) are configured with the correct input (./data/raw_1min_top_sp500_bulk/) and output (./data/processed_1min_top_sp500_bulk/) directories.
-Run the data processing pipeline scripts (run_data_processing.py).
-Update the data loading path in the notebooks (./notebooks/) to point to the location of the final processed dataset.
-Usage
+-   If using Polygon.io, configure the paths and settings in `src/data_processing/bulk_polygon_data.py` and run it.
+-   If using a different data source, format your raw minute-level data to be compatible with the structure expected by `src/data_processing/process_missing_data.py` (ideally, partitioned Parquet files by symbol, year, month with relevant columns) and place it in `./data/raw_1min_top_sp500_bulk/`.
+-   Ensure the data processing scripts (`src/data_processing/`) are configured with the correct input (`./data/raw_1min_top_sp500_bulk/`) and output (`./data/processed_1min_top_sp500_bulk/`) directories.
+-   Run the data processing pipeline scripts (`run_data_processing.py`).
+-   Update the data loading path in the notebooks (`./notebooks/`) to point to the location of the final processed dataset.
+
+## Usage
+
 Ensure you have completed the Data Processing Pipeline steps and the final processed data is ready in the expected location.
-Open the Jupyter notebooks in the ./notebooks/ directory (e.g., MARKET_RV.ipynb for modeling, MARKET_RV_EDA.ipynb for exploration).
-Update the data loading path in the notebook(s) to point to your processed dataset file.
-Run the cells sequentially in the notebook(s).
-The MARKET_RV.ipynb notebook loads the processed data, sets up time-series cross-validation, applies necessary preprocessing (scaling, encoding) within folds to prevent data leakage, trains and evaluates the machine learning models, and reports performance metrics.
 
-Results
-The data processing scripts produce the intermediate and final processed data files. The modeling notebook (MARKET_RV.ipynb) prints the results of the model training and evaluation, including R-squared, MSE, and MAE for the models, typically aggregated across cross-validation folds. It also includes analysis of performance per ticker.
+-   Open the Jupyter notebooks in the `./notebooks/` directory (e.g., `MARKET_RV.ipynb` for modeling, `MARKET_RV_EDA.ipynb` for exploration).
+-   Update the data loading path in the notebook(s) to point to your processed dataset file.
+-   Run the cells sequentially in the notebook(s).
 
-Project Structure
+The `MARKET_RV.ipynb` notebook loads the processed data, sets up time-series cross-validation, applies necessary preprocessing (scaling, encoding) within folds to prevent data leakage, trains and evaluates the machine learning models, and reports performance metrics.
+
+## Results
+
+The data processing scripts produce the intermediate and final processed data files. The modeling notebook (`MARKET_RV.ipynb`) prints the results of the model training and evaluation, including R-squared, MSE, and MAE for the models, typically aggregated across cross-validation folds. It also includes analysis of performance per ticker.
+
+## Project Structure
+
+```
 .
-├── README.md                # This README file
-├── data                     # Directory for data files
-│   ├── info                 # Directory for information files
-│   │   └── all_sp500.csv    # File containing the list of tickers
+├── README.md             # This README file
+├── data                  # Directory for data files
+│   ├── info              # Directory for information files
+│   │   └── all_sp500.csv # File containing the list of tickers
 │   ├── raw_1min_top_sp500_bulk/ # (Expected) Directory for raw fetched data (Partitioned Parquet)
 │   └── processed_1min_top_sp500_bulk/ # (Expected) Directory for cleaned and processed data (Partitioned Parquet)
-├── models                   # Directory for saving trained models (if implemented)
-├── notebooks                # Directory for Jupyter notebooks
-│   ├── MARKET_RV.ipynb      # Main notebook for model training and evaluation
-│   └── MARKET_RV_EDA.ipynb  # Notebook for data exploration and analysis
-└── src                      # Directory for source code scripts
-    ├── augmented_model      # Directory for augmented model implementations (e.g., custom PyTorch models)
-    │   └── rv_model.py      # Example model file (e.g., a custom Neural Network)
-    └── data_processing      # Directory for data processing scripts
+├── models                # Directory for saving trained models (if implemented)
+├── notebooks             # Directory for Jupyter notebooks
+│   ├── MARKET_RV.ipynb   # Main notebook for model training and evaluation
+│   └── MARKET_RV_EDA.ipynb # Notebook for data exploration and analysis
+└── src                   # Directory for source code scripts
+    ├── augmented_model   # Directory for augmented model implementations (e.g., custom PyTorch models)
+    │   └── rv_model.py   # Example model file (e.g., a custom Neural Network)
+    └── data_processing   # Directory for data processing scripts
         ├── bulk_polygon_data.py     # Script for fetching raw data from Polygon.io API
         ├── data_processing.py       # Contains core data processing, feature engineering (Pass A & B), and data preparation logic
         ├── process_missing_data.py  # Script for handling missing minute-level data and ensuring data completeness
         └── run_data_processing.py   # Orchestrates the data processing pipeline, including computing market targets
-Note: The directories raw_1min_top_sp500_bulk/ and processed_1min_top_sp500_bulk/ are not shown in your ls -R output but are inferred from the script configurations. You should create these directories if they don't exist before running the data processing.
+
+```
+
+Note: The directories `raw_1min_top_sp500_bulk/` and `processed_1min_top_sp500_bulk/` are not shown in your `ls -R` output but are inferred from the script configurations. You should create these directories if they don't exist before running the data processing.
